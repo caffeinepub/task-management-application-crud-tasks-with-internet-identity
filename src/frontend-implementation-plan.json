@@ -1,0 +1,310 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Task Manager 2.0 frontend: expanded task model UI, advanced organization, Kanban DnD, dashboard, shortcuts, refresh, polish, and empty-state asset",
+  "requirements": [
+    {
+      "id": "REQ-14",
+      "summary": "Update task create/edit UI to support required due date, status/priority/tags inputs, and show created/updated metadata with English validation and non-closing error UX.",
+      "acceptanceCriteria": [
+        "The task form cannot be submitted without a due date; the UI shows an English validation message for missing required fields.",
+        "The task form supports editing status, priority, and tags, and saving updates reflects immediately in the list/Kanban views.",
+        "Any backend validation failures are shown in the form without closing it (retain existing improved mutation error UX)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Tasks/TaskForm.tsx",
+          "operation": "modify",
+          "description": "Expand the form to make due date required and add status, priority, and tags inputs; keep existing mutation error handling so backend failures are shown inline without closing; show created/updated timestamps where appropriate for edit mode. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useCreateTask.ts",
+          "operation": "modify",
+          "description": "Update create-task mutation to send required dueDate plus priority and tags to the backend and keep React Query cache invalidation consistent. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useUpdateTask.ts",
+          "operation": "modify",
+          "description": "Update update-task mutation to include dueDate (required), priority, and tags, and preserve the existing normalized error behavior. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskItem.tsx",
+          "operation": "modify",
+          "description": "Migrate task rendering from legacy completed boolean assumptions to TaskStatus-based display (Open/In Progress/Completed/Archived) so edits from the upgraded form reflect correctly. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanCard.tsx",
+          "operation": "modify",
+          "description": "Migrate task rendering from legacy completed boolean assumptions to TaskStatus-based display so edits from the upgraded form reflect correctly in Kanban cards. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-15",
+      "summary": "Add due-date intelligence badges and overdue highlighting in both list items and Kanban cards with date-correct labels.",
+      "acceptanceCriteria": [
+        "Tasks display the correct badge text and color based on due date and completion status, matching the requested labels (e.g., \"Due today\", \"Tomorrow\", \"2 days left\", \"3 days overdue\", \"Done\").",
+        "Overdue tasks that are not completed are visually highlighted in both list items and Kanban cards.",
+        "Badge logic works for tasks with due dates in the past/future and for completed tasks."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Tasks/taskUtils.ts",
+          "operation": "modify",
+          "description": "Add shared helpers to compute due-date badge label/variant (Today/Tomorrow/Due in X/X overdue/Done) and an isOverdue flag using consistent time conversions used elsewhere. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskItem.tsx",
+          "operation": "modify",
+          "description": "Render countdown badges and apply overdue styling (red left border + light red background) for non-completed overdue tasks in the list item UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanCard.tsx",
+          "operation": "modify",
+          "description": "Render countdown badges and apply overdue styling (red left border + light red background) for non-completed overdue tasks in the Kanban card UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Add minimal, token-based utility classes (via Tailwind usage patterns) or CSS variable-backed styling support so overdue highlight backgrounds/borders remain readable in light and dark themes. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-16",
+      "summary": "Implement advanced filtering, sorting, and quick filter chips consistent across List and Kanban views.",
+      "acceptanceCriteria": [
+        "Users can filter tasks by status (including Archived), due-date range (Today/This Week/Overdue), priority, and tags, and can search title/description.",
+        "Users can sort by Due Date (default), Priority, Created Date, and Alphabetical, with ascending/descending where applicable.",
+        "Quick filter chips apply and clear the corresponding filters, and the results are consistent across List and Kanban views."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Tasks/taskUtils.ts",
+          "operation": "modify",
+          "description": "Extend filtering/sorting to support: status (including Archived), due-date ranges (Today/This Week/Overdue), priority, tags, and title/description search; implement sorting options (Due Date default, Priority, Created Date, Alphabetical) with direction where applicable. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskToolbar.tsx",
+          "operation": "modify",
+          "description": "Extend toolbar UI to include advanced filters (status incl. Archived, due-date range, priority, tags) and sorting options; add quick filter chips (Overdue, Due Today, High Priority, Completed) with clear/toggle behavior. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Replace legacy filter/sort state with Task Manager 2.0 filter model; apply the same filteredTasks collection to both List and Kanban views to guarantee consistent results. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-17",
+      "summary": "Upgrade Kanban to multi-status columns with drag-and-drop for status changes and per-column ordering persistence restored after refresh.",
+      "acceptanceCriteria": [
+        "Users can drag a task card between Kanban columns; dropping updates task status and the UI reflects the change immediately.",
+        "Within a column, users can reorder tasks via drag-and-drop and the order persists after a full page reload.",
+        "The backend stores and returns enough ordering information to restore per-user Kanban order reliably."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/tasks/useUpdateTaskStatus.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that updates a task's status via the backend function and keeps the tasks cache consistent after drag-and-drop or quick actions. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useUpdateTaskOrder.ts",
+          "operation": "create",
+          "description": "Add a React Query mutation hook that persists per-status ordered task IDs to the backend and updates/invalidates caches so the order is restored after refresh. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanView.tsx",
+          "operation": "modify",
+          "description": "Replace the 2-column board with status-based columns (Open, In Progress, Completed, Archived) and implement drag-and-drop across columns and within a column; on drop, optimistically update UI, call status/order mutations, and recover gracefully on error. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanCard.tsx",
+          "operation": "modify",
+          "description": "Add drag handle / draggable affordances and ensure the card UI supports being moved between status columns without breaking existing actions (edit/delete/complete). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Wire the updated Kanban view props/state so it receives the correctly filtered tasks and can trigger ordering/status persistence, while keeping view-mode switching intact. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-18",
+      "summary": "Add dashboard summary metrics (open count, completed today, overdue, due this week) computed from the signed-in user’s tasks and displayed on the task page.",
+      "acceptanceCriteria": [
+        "The task page shows the four metrics (open, completed today, overdue, due this week) and they update when tasks are created/updated/completed.",
+        "Metric calculations treat dates consistently (use the same time unit conversions used elsewhere in the app)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Tasks/taskUtils.ts",
+          "operation": "modify",
+          "description": "Add metric computation helpers for: open count, completed today, overdue count, and due this week using consistent nanoseconds↔milliseconds conversions and TaskStatus semantics. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Render the four dashboard metrics prominently near the page header and ensure they update from the current tasks query data without extra loading flashes. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "summary": "Add modern productivity UX: command palette, keyboard shortcuts, inline edits, duplicate, archive/unarchive, bulk select/actions, and dismissible due-soon/overdue banners.",
+      "acceptanceCriteria": [
+        "Keyboard shortcuts work when the user is on the tasks page and do not interfere with typing inside form fields.",
+        "Users can select multiple tasks and apply bulk actions with clear confirmation for destructive actions.",
+        "Duplicate creates a new task with copied fields (title/description/due date/status/priority/tags) but a new id.",
+        "Archive/unarchive is supported in the UI and integrated into filters and Kanban columns as specified.",
+        "Due soon / overdue banners appear and can be dismissed for the current session."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useKeyboardShortcuts.ts",
+          "operation": "create",
+          "description": "Create a focused keyboard shortcuts hook to support N (new task), F (focus search), and K (command palette) only when on the tasks page and not typing in input/textarea/contenteditable elements. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/CommandPalette.tsx",
+          "operation": "create",
+          "description": "Add a lightweight command palette UI for quick add/navigation/actions (UI-only where needed) and wire actions for create, search focus, view toggle, and common task operations. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/DueAlertsBanner.tsx",
+          "operation": "create",
+          "description": "Add dismissible session-scoped notification banners for due soon / overdue counts derived from tasks; persist dismissal in sessionStorage for the current session. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskBulkActionsBar.tsx",
+          "operation": "create",
+          "description": "Create a bulk actions bar UI (complete, archive, delete) with clear confirmations for destructive actions, designed to work with both list selection and filtered task sets. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskItem.tsx",
+          "operation": "modify",
+          "description": "Add inline edit affordances for common fields (e.g., status/priority/tags or title) and selection checkbox wiring for bulk actions; add duplicate and archive/unarchive actions while keeping existing delete confirmation flow. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanCard.tsx",
+          "operation": "modify",
+          "description": "Add quick actions for duplicate and archive/unarchive and optional inline edits suitable for a compact card; ensure actions integrate with TaskStatus-based Kanban columns. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Wire command palette visibility, keyboard shortcuts, quick add, search focusing, bulk selection state, and bulk actions execution; integrate due-soon/overdue banners and ensure archived tasks integrate with filters and Kanban columns. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useCreateTask.ts",
+          "operation": "modify",
+          "description": "Support 'duplicate task' by allowing create mutation callers to pass copied fields (including status/priority/tags/dueDate) and keep cache updates consistent. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useDeleteTask.ts",
+          "operation": "modify",
+          "description": "Harden delete mutation UX for bulk deletes (e.g., allow batched sequential deletes from UI while maintaining consistent invalidation) without changing backend behavior. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "summary": "Replace real-time collaboration with periodic React Query refresh on interval and window focus without disruptive loading states.",
+      "acceptanceCriteria": [
+        "Tasks refresh automatically on a reasonable interval and on window focus, without flashing the entire page into a loading state.",
+        "After create/update/complete/reopen/delete operations, the tasks list/Kanban remains consistent with the backend without requiring a manual reload."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/tasks/useTasks.ts",
+          "operation": "modify",
+          "description": "Configure React Query to refetch tasks on an interval and on window focus while keeping prior data to avoid full-page loading flashes; ensure the query remains gated on actor + identity readiness. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useUpdateTask.ts",
+          "operation": "modify",
+          "description": "Ensure post-mutation cache handling remains consistent with periodic refresh (invalidate/update queries appropriately so UI stays stable without manual reload). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/tasks/useToggleCompleteTask.ts",
+          "operation": "modify",
+          "description": "Update completion toggling to use TaskStatus-based updates and ensure cache updates remain consistent with periodic refresh behavior. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "summary": "Polish UX with loading skeletons, mobile responsiveness, and an optional dark mode toggle using existing theme tokens.",
+      "acceptanceCriteria": [
+        "While tasks are loading, the UI shows skeleton components instead of empty content.",
+        "The tasks page (toolbar, list, Kanban, form) remains usable on small screens without horizontal scrolling.",
+        "A dark mode toggle exists and correctly switches styles across primary screens using the existing CSS variables/theme tokens."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Tasks/TaskListSkeleton.tsx",
+          "operation": "create",
+          "description": "Create a skeleton loading component for the list view using existing UI primitives and theme tokens (no changes under immutable UI component paths). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanSkeleton.tsx",
+          "operation": "create",
+          "description": "Create a skeleton loading component for the Kanban view that matches the multi-column layout and supports responsive widths. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskList.tsx",
+          "operation": "modify",
+          "description": "Replace the spinner-only loading state with the new skeleton component and ensure empty/loading states remain accessible and readable on mobile. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskKanbanView.tsx",
+          "operation": "modify",
+          "description": "Integrate Kanban skeleton loading state support and refine responsive column layout for small screens (horizontal scroll if needed, without breaking drag-and-drop). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Refine responsive layout (header/toolbar/form placement) for mobile and wire skeleton usage in both list and Kanban modes without horizontal overflow. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useDarkMode.ts",
+          "operation": "create",
+          "description": "Add a small hook to toggle the 'dark' class on the document root and persist preference locally; rely on existing CSS variables/theme tokens. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Layout/Header.tsx",
+          "operation": "modify",
+          "description": "Add an optional dark mode toggle control in the header using the existing token system (toggling the 'dark' class) while keeping the authentication UI intact. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "summary": "Add a generated empty-state illustration asset and render it in signed-out and/or tasks empty state as a static frontend asset.",
+      "acceptanceCriteria": [
+        "The generated illustration is stored in frontend/public/assets/generated and is referenced directly by the React UI.",
+        "When the task list is empty, the UI shows an empty state that includes the illustration and clear English text prompting the user to create a task."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png",
+          "operation": "create",
+          "description": "Add the generated illustration asset at the exact path frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png so it can be served statically (do not route through backend). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskList.tsx",
+          "operation": "modify",
+          "description": "Update the empty state UI to render the illustration from frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png with clear English guidance to create a new task. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Auth/SignedOutScreen.tsx",
+          "operation": "modify",
+          "description": "Optionally render the same illustration from frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png on the landing screen to reinforce branding and empty-state visuals. Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

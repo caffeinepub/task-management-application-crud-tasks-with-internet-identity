@@ -1,0 +1,253 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 9,
+  "summary": "Task management application project expanded toward a “Task Manager 2.0” feature set (SaaS-like UX) while remaining on the Caffeine-supported stack (Motoko backend + React/Vite + TypeScript). Real-time collaboration is replaced with periodic refresh + React Query cache updates, and multi-user support is principal-based via Internet Identity.",
+  "architectural_notes": [
+    "Caffeine target stack constraint: Motoko backend + React (Vite) + TypeScript frontend; no Next.js/Prisma/Postgres/NextAuth/Node/Redis/WebSockets/Pusher/Ably/Docker.",
+    "Real-time collaboration is replaced with periodic refresh + React Query refetching/cache updates.",
+    "Multi-user is implemented via Internet Identity principals; data isolation and (future) workspace concepts are principal-based."
+  ],
+  "known_issues": [
+    "Users report being unable to create tasks (tasks are not saving)."
+  ],
+  "isFixRequest": true,
+  "imageRequirements": "## Required Images\n- Minimal flat-vector empty state illustration featuring a clipboard, checkmarks, and a small plant, in a green-forward palette (empty-state-clipboard.dim_1200x800.png)",
+  "existing_features": [
+    {
+      "id": "feature-implement-internet-identity-based-sign-in-and-sign-out-in-the-ui-and-gate-task-data-so-each-authenticated-principal-only-sees-and-edits-their-own-tasks",
+      "title": "Implement Internet Identity-based sign-in and sign-out in the UI, and gate task data so each authenticated principal only sees and edits their own tasks.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-the-main-task-management-ui-a-task-list-view-with-create-edit-task-form-ability-to-mark-complete-reopen-and-delete-tasks-using-react-query-for-data-fetching-and-mutation-states-loading-success-error",
+      "title": "Build the main task management UI: a task list view with create/edit task form, ability to mark complete/reopen, and delete tasks, using React Query for data fetching and mutation states (loading/success/error).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-task-organization-and-discovery-features-in-the-ui-filtering-by-status-all-open-completed-sorting-e-g-by-created-date-and-due-date-and-search-by-text-title-description",
+      "title": "Add task organization and discovery features in the UI: filtering by status (all/open/completed), sorting (e.g., by created date and due date), and search by text (title/description).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-establish-a-coherent-distinct-visual-theme-for-the-app-colors-typography-spacing-and-component-styling-and-apply-it-consistently-across-the-primary-screens-auth-state-task-list-task-editor-avoid-blue-purple-as-primary-brand-colors",
+      "title": "Establish a coherent, distinct visual theme for the app (colors, typography, spacing, and component styling) and apply it consistently across the primary screens (auth state, task list, task editor). Avoid blue/purple as primary brand colors.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-kanban-board-view-for-tasks-on-the-main-task-management-page-with-a-clear-ui-control-to-switch-between-the-existing-list-view-and-the-new-kanban-view",
+      "title": "Add a Kanban board view for tasks on the main task management page, with a clear UI control to switch between the existing List view and the new Kanban view.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-display-due-date-count-indicators-for-the-signed-in-user-s-tasks-including-counts-for-overdue-tasks-and-tasks-due-soon-computed-from-existing-task-due-dates",
+      "title": "Display due-date count indicators for the signed-in user’s tasks, including counts for overdue tasks and tasks due soon, computed from existing task due dates.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-the-frontend-create-update-task-ux-so-failures-to-save-are-clearly-shown-to-the-user-e-g-display-the-mutation-error-message-in-the-task-form-and-do-not-silently-close-the-form-on-failure-use-english-for-all-user-facing-error-text",
+      "title": "Improve the frontend create/update task UX so failures to save are clearly shown to the user (e.g., display the mutation error message in the task form and do not silently close the form on failure). Use English for all user-facing error text.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-task-create-edit-ui-to-match-the-upgraded-task-model-make-due-date-a-required-field-add-status-priority-and-tags-inputs-display-created-updated-metadata-where-appropriate-ensure-all-user-facing-validation-and-error-text-is-in-english",
+      "title": "Update the task create/edit UI to match the upgraded task model: make due date a required field; add status, priority, and tags inputs; display created/updated metadata where appropriate; ensure all user-facing validation and error text is in English.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-due-date-intelligence-in-the-ui-show-dynamic-countdown-badges-for-tasks-today-tomorrow-due-in-x-days-x-days-overdue-done-and-visually-highlight-overdue-tasks-red-left-border-light-red-background-in-both-list-and-kanban-cards-ensure-badge-text-updates-correctly-based-on-current-date",
+      "title": "Implement due-date intelligence in the UI: show dynamic countdown badges for tasks (Today, Tomorrow, Due in X days, X days overdue, Done) and visually highlight overdue tasks (red left border + light red background) in both List and Kanban cards; ensure badge text updates correctly based on current date.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-expand-task-organization-features-add-advanced-filtering-status-including-archived-due-date-ranges-today-this-week-overdue-priority-tags-and-sorting-due-date-default-priority-created-date-alphabetical-plus-quick-filter-chips-overdue-due-today-high-priority-completed",
+      "title": "Expand task organization features: add advanced filtering (status including Archived, due-date ranges: Today/This Week/Overdue, priority, tags) and sorting (Due Date default, Priority, Created Date, Alphabetical) plus quick filter chips (Overdue, Due Today, High Priority, Completed).",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-upgrade-kanban-to-support-multiple-columns-by-status-open-in-progress-completed-archived-as-appropriate-with-drag-and-drop-between-columns-on-drop-update-the-task-status-and-persist-per-user-ordering-so-the-same-order-is-restored-after-refresh",
+      "title": "Upgrade Kanban to support multiple columns by status (Open, In Progress, Completed, Archived as appropriate) with drag-and-drop between columns; on drop, update the task status and persist per-user ordering so the same order is restored after refresh.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-dashboard-summary-metrics-for-the-signed-in-user-open-tasks-count-completed-today-overdue-count-and-tasks-due-this-week-computed-from-the-user-s-tasks-and-displayed-prominently-on-the-task-page",
+      "title": "Add dashboard summary metrics for the signed-in user: open tasks count, completed today, overdue count, and tasks due this week, computed from the user’s tasks and displayed prominently on the task page.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-modern-productivity-ux-ui-only-where-necessary-quick-add-command-palette-keyboard-shortcuts-n-new-task-f-search-k-command-palette-inline-edit-for-common-fields-duplicate-task-archive-unarchive-task-bulk-select-with-bulk-actions-complete-archive-delete-and-lightweight-notification-banners-for-due-soon-overdue",
+      "title": "Add modern productivity UX (UI-only where necessary): quick add / command palette, keyboard shortcuts (N new task, F search, K command palette), inline edit for common fields, duplicate task, archive/unarchive task, bulk select with bulk actions (complete, archive, delete), and lightweight notification banners for due soon/overdue.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-replace-real-time-collaboration-with-periodic-refresh-configure-task-fetching-to-automatically-refresh-on-an-interval-and-on-window-focus-while-maintaining-good-ux-no-disruptive-loading-states-and-ensuring-react-query-cache-stays-consistent-after-mutations",
+      "title": "Replace real-time collaboration with periodic refresh: configure task fetching to automatically refresh on an interval and on window focus, while maintaining good UX (no disruptive loading states) and ensuring React Query cache stays consistent after mutations.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-improve-overall-ux-polish-add-loading-skeletons-for-task-lists-kanban-responsive-layout-refinements-for-mobile-and-an-optional-dark-mode-toggle-that-uses-the-existing-theme-token-system",
+      "title": "Improve overall UX polish: add loading skeletons for task lists/Kanban, responsive layout refinements for mobile, and an optional dark mode toggle that uses the existing theme token system.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-custom-empty-state-illustration-asset-and-render-it-in-the-unauthenticated-landing-screen-and-or-the-tasks-empty-state-when-there-are-no-tasks-served-as-a-static-frontend-asset-do-not-route-through-the-backend",
+      "title": "Add a custom empty-state illustration asset and render it in the unauthenticated landing screen and/or the tasks empty state (when there are no tasks), served as a static frontend asset (do not route through the backend).",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Create a task management application.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Create a Motoko task data model and persistence for a task management application, including stable storage across canister upgrades, with API methods to create, list, update, complete/reopen, and delete tasks for the authenticated caller.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Add a Kanban board view for tasks (e.g., columns by status) in the task management UI.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add a due-date count indicator (e.g., counts of tasks due soon/overdue) in the UI.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Fix backend task and profile persistence so that creating a task actually stores it and it appears in subsequent `getTasks()` calls for the signed-in user.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Add stable storage support for user profiles, per-user task lists, and per-user next task IDs so tasks do not disappear on canister upgrade, using the existing conditional migration policy (add `backend/migration.mo` only if required for upgrading existing state).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Upgrade task model and UI to support expanded fields: required due date, status (Open/In Progress/Completed/Archived), priority, tags, timestamps, and future-ready assignedTo; implement due-date intelligence badges and overdue highlighting.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add subtasks: per-task subtask checklist with progress indicator (e.g., 3/7), optional auto-complete parent when all subtasks completed, and corresponding backend persistence for authenticated principals.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Implement advanced list features: filtering (status, due date ranges, priority, tags), full-text search (title/description), and sorting (due date default, priority, created date, alphabetical), plus quick filter chips.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Enhance Kanban view with drag-and-drop between columns and persisted ordering per user; update task status on drop and maintain smooth UI interactions.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add dashboard summary metrics (open count, completed today, overdue count, due this week) computed from the signed-in user’s tasks.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add modern productivity UX: quick add/command palette, keyboard shortcuts, inline edit, duplicate/archive, bulk select + bulk actions, notifications UI (due soon/overdue banner), loading skeletons, empty states, responsive layout, and optional dark mode toggle.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Fix backend persistence so that tasks and user profiles reliably persist across calls and canister upgrades, using stable storage for per-principal task maps and per-principal next task IDs; ensure tasks created via createTask always appear in subsequent getTasks() calls for the same authenticated principal.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Upgrade the backend task data model and APIs to support Task Manager 2.0 fields per task: required dueDate, status (Open/In Progress/Completed/Archived), priority (Low/Medium/High/Urgent), tags (array of text), createdAt/updatedAt timestamps, createdBy (principal), optional assignedTo (principal, future use), and a per-user persisted ordering key for Kanban (e.g., per-status order index).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Add subtasks with backend persistence: each task supports an ordered checklist of subtasks (id, title, isCompleted). Provide APIs to add/update/delete subtasks and toggle completion, and include subtask data when fetching tasks.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Task Management Application (CRUD tasks with Internet Identity)",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

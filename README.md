@@ -1,2 +1,3 @@
-# task-management-application-crud-tasks-with-internet-identity
-Exported from Caffeine project: Task Management Application (CRUD tasks with Internet Identity)
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`
