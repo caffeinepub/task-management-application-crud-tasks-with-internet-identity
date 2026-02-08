@@ -1,86 +1,56 @@
 {
   "kind": "build_request",
-  "title": "Fix initial load to always show Features + Login screen (eliminate Access Denied flash)",
-  "priority": "high",
+  "title": "Remove left-side bulk-select checkbox from task list rows (keep only completion checkbox)",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-28",
-      "text": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
+      "id": "REQ-31",
+      "text": "In the List view task rows, remove the left-side (bulk-select) checkbox (the first/left checkbox marked in red in the provided screenshot) so that each task row shows only one checkbox: the task completion checkbox.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-1"
         ],
         "quotes": [
-          "still come same issue fix , i want first page features page and login page",
-          "yes fix"
+          "first means left side first (marked in red color)"
         ]
       },
       "acceptanceCriteria": [
-        "Open the site in a fresh Incognito window: the first screen shown is the Features + Sign in landing screen (SignedOutScreen).",
-        "At no point during initial load (including while auth state initializes) does an “Access Denied” screen appear for a signed-out user.",
-        "No route/state in the app renders or navigates to an Access Denied screen/component for a signed-out user."
+        "In List view, each task row renders exactly one checkbox control (the completion checkbox).",
+        "The leftmost/bulk-select checkbox is not rendered anywhere in the task list rows.",
+        "There is no duplicate checkbox UI in the task list rows (matches the screenshot intent).",
+        "The remaining checkbox continues to toggle task completion/reopen as it did previously."
       ]
     },
     {
-      "id": "REQ-29",
-      "text": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
+      "id": "REQ-32",
+      "text": "Disable or remove bulk-selection wiring from the List view so the removed bulk-select checkbox is not passed/rendered via props (e.g., stop passing selection props into task-row components) and the bulk actions bar does not appear due to leftover selection state.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages"
+          "msg-1"
         ],
         "quotes": [
-          "still come same issue fix , i want first page features page and login page"
+          "Remove the left-side (bulk-select) checkbox from each task row, leaving only the task completion checkbox; ensure no duplicate checkboxes remain in list view."
         ]
       },
       "acceptanceCriteria": [
-        "If the backend returns an authorization failure during profile loading, the app logs the user out (clears Internet Identity session in-app) and shows the signed-out landing screen instead of showing an Access Denied page.",
-        "The authorization error handling does not rely on a single exact error string; common authorization/permission-denied variants are handled consistently.",
-        "After the session is cleared due to an auth error, React Query caches are cleared/invalidated so protected queries do not keep failing in a loop."
-      ]
-    },
-    {
-      "id": "REQ-30",
-      "text": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it (keep the file removed or as a non-renderable stub, but ensure it cannot produce UI).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "recent-messages"
-        ],
-        "quotes": [
-          "These images ... confirm the Access Denied screen is still showing on first load."
-        ]
-      },
-      "acceptanceCriteria": [
-        "There is no working AccessDeniedScreen UI that can be rendered by the app in any state.",
-        "A code search for rendering/route usage of an Access Denied screen returns no active usages (imports/references that can render UI).",
-        "Refreshing the app repeatedly while signed out never shows an Access Denied card/page."
+        "Task rows do not receive or depend on selection props for rendering a selection checkbox.",
+        "The bulk actions selection UI does not appear as a result of any default/leftover selection state after this change.",
+        "No user-facing text regressions are introduced; any visible labels remain in English."
       ]
     }
   ],
   "constraints": [
-    "Use English for any user-facing text.",
-    "Do not edit files under frontend/src/components/ui or any other paths listed in frontend.immutablePaths.",
-    "Keep the backend architecture as a single Motoko actor; only introduce migration.mo if a state upgrade is required (not expected for this UI/routing fix)."
+    "Frontend paths listed as immutable must not be edited (compose UI components instead).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Adding new task-management features (Kanban, filters, etc.).",
-    "Changing the Internet Identity provider implementation details in frontend/src/hooks/useInternetIdentity.ts (immutable).",
-    "Adding third-party authentication or routing frameworks."
+    "Implementing an alternative bulk-selection UI (e.g., row-click to select, select-all, multi-select keyboard shortcuts).",
+    "Any of the other requested upgrades (comments, completed_at, duration_hours, animations, card layout changes) beyond this first one-by-one step."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

@@ -1,18 +1,15 @@
 import { Task } from '../../backend';
 import TaskItem from './TaskItem';
 import TaskListSkeleton from './TaskListSkeleton';
-import { Inbox } from 'lucide-react';
 
 interface TaskListProps {
   tasks: Task[];
   isLoading: boolean;
   onEdit: (taskId: bigint) => void;
   onDuplicate?: (task: Task) => void;
-  selectedTasks?: Set<bigint>;
-  onSelectTask?: (taskId: bigint, selected: boolean) => void;
 }
 
-export default function TaskList({ tasks, isLoading, onEdit, onDuplicate, selectedTasks, onSelectTask }: TaskListProps) {
+export default function TaskList({ tasks, isLoading, onEdit, onDuplicate }: TaskListProps) {
   if (isLoading) {
     return <TaskListSkeleton />;
   }
@@ -41,8 +38,6 @@ export default function TaskList({ tasks, isLoading, onEdit, onDuplicate, select
           task={task}
           onEdit={onEdit}
           onDuplicate={onDuplicate}
-          isSelected={selectedTasks?.has(task.id)}
-          onSelect={onSelectTask}
         />
       ))}
     </div>

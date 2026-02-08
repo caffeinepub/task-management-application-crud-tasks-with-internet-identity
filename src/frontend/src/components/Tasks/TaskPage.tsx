@@ -6,7 +6,6 @@ import TaskForm from './TaskForm';
 import TaskList from './TaskList';
 import TaskKanbanView from './TaskKanbanView';
 import TaskToolbar from './TaskToolbar';
-import TaskBulkActionsBar from './TaskBulkActionsBar';
 import DueAlertsBanner from './DueAlertsBanner';
 import CommandPalette from './CommandPalette';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,7 +31,6 @@ export default function TaskPage() {
   const [showForm, setShowForm] = useState(false);
   const [editingTaskId, setEditingTaskId] = useState<bigint | null>(null);
   const [viewMode, setViewMode] = useState<ViewMode>('list');
-  const [selectedTasks, setSelectedTasks] = useState<Set<bigint>>(new Set());
   const [showCommandPalette, setShowCommandPalette] = useState(false);
 
   const filteredTasks = filterAndSortTasks(tasks, {
@@ -65,20 +63,6 @@ export default function TaskPage() {
       priority: task.priority,
       tags: task.tags,
     });
-  };
-
-  const handleSelectTask = (taskId: bigint, selected: boolean) => {
-    const newSelected = new Set(selectedTasks);
-    if (selected) {
-      newSelected.add(taskId);
-    } else {
-      newSelected.delete(taskId);
-    }
-    setSelectedTasks(newSelected);
-  };
-
-  const handleClearSelection = () => {
-    setSelectedTasks(new Set());
   };
 
   useKeyboardShortcuts({
@@ -225,21 +209,12 @@ export default function TaskPage() {
 
           <Separator />
 
-          {selectedTasks.size > 0 && (
-            <TaskBulkActionsBar
-              selectedTaskIds={Array.from(selectedTasks)}
-              onClearSelection={handleClearSelection}
-            />
-          )}
-
           {viewMode === 'list' ? (
             <TaskList
               tasks={filteredTasks}
               isLoading={isLoading}
               onEdit={handleEdit}
               onDuplicate={handleDuplicate}
-              selectedTasks={selectedTasks}
-              onSelectTask={handleSelectTask}
             />
           ) : (
             <TaskKanbanView
@@ -265,7 +240,7 @@ export default function TaskPage() {
         }}
         onToggleView={() => {
           setShowCommandPalette(false);
-          setViewMode(viewMode === 'list' ? 'kanban' : 'list');
+          setViewMode((prev) => (prev === 'list' ? 'kanban' : 'list'));
         }}
       />
     </div>

@@ -1,24 +1,38 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T13:08:59.675Z",
-  "summary": "REQ-28 and REQ-29 appear implemented via App.tsx changes that (a) render SignedOutScreen during initialization/when unauthenticated to prevent transient Access Denied UI, and (b) clear the session + React Query cache on authorization-like errors using a broader matcher. REQ-30 is not satisfied because the diff provides evidence that a renderable AccessDeniedScreen still exists in the project state summaries, with no removal/stubbing shown.",
-  "missing_requirements": [
+  "generatedAt": "2026-02-08T14:06:26.961Z",
+  "summary": "The diff appears to remove the left/bulk-select checkbox from task list rows and stops passing any selection-related props into the row component. However, the modified components also include several broader UI/feature changes that were not requested in REQ-31/REQ-32 and conflict with the stated non-goals.",
+  "missing_requirements": [],
+  "hallucinated_features": [
     {
-      "id": "REQ-30",
-      "requirement": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it.",
-      "reason": "The diff does not remove or stub AccessDeniedScreen. The repository summary still describes a concrete, renderable AccessDeniedScreen component (“Error screen displayed when authorization fails or user lacks permissions.”), which conflicts with the requirement that no renderable implementation exist in the runtime bundle.",
+      "description": "Task row UI expanded beyond checkbox removal (Card-based layout, status/priority labels, due-date badge/overdue styling, and additional action buttons like duplicate/archive).",
+      "reason": "BuildRequest explicitly scoped changes to removing the bulk-select checkbox and disabling bulk-selection wiring, and listed other UI upgrades as non-goals for this step. The diff shows multiple additional UI/behavior elements in TaskItem unrelated to bulk selection.",
       "evidence": [
-        "frontend-file-summaries.txt (entry for frontend/src/components/Error/AccessDeniedScreen.tsx)"
+        "frontend/src/components/Tasks/TaskItem.tsx"
+      ]
+    },
+    {
+      "description": "List empty-state UI with illustration and additional copy.",
+      "reason": "Not requested by REQ-31/REQ-32; introduces additional UI content beyond removing the bulk-select checkbox and selection wiring.",
+      "evidence": [
+        "frontend/src/components/Tasks/TaskList.tsx"
+      ]
+    },
+    {
+      "description": "Keyboard shortcuts and command palette wiring on the task page (and other Task Manager 2.0 dashboard/view logic shown in snippet).",
+      "reason": "Not requested by REQ-31/REQ-32 and falls under 'other requested upgrades ... beyond this first one-by-one step' as non-goals.",
+      "evidence": [
+        "frontend/src/components/Tasks/TaskPage.tsx"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.74,
+  "confidence": 0.62,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/utils/isAuthorizationError.ts",
+    "frontend/src/components/Tasks/TaskItem.tsx",
+    "frontend/src/components/Tasks/TaskList.tsx",
+    "frontend/src/components/Tasks/TaskPage.tsx",
     "project_state.json"
   ]
 }

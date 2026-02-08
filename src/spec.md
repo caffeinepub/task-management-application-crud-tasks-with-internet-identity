@@ -1,12 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Ensure the app never flashes or renders any “Access Denied” UI during initial load for signed-out users, and always shows the Features + Sign in landing screen when not authenticated.
+**Goal:** Remove the left-side bulk-select checkbox from List view task rows so only the task completion checkbox remains.
 
 **Planned changes:**
-- Adjust initial auth/route gating so signed-out users always render the signed-out landing screen (Features + Sign in) throughout initialization, with no transient “Access Denied” state.
-- Harden top-level authorization error handling during authenticated startup so any auth/permission-related failure clears the in-app session and returns the user to the signed-out landing screen, without relying on a single exact error-string match.
-- Clear/Invalidate React Query caches after forced logout due to an authorization error to prevent protected queries from repeatedly failing.
-- Remove any remaining renderable “Access Denied” screen implementation and eliminate all code paths that import/route/render it.
+- Update List view task row UI to render exactly one checkbox (the completion checkbox) and remove the leftmost/bulk-select checkbox.
+- Remove/disable bulk-selection wiring in List view so selection props/state are not passed into task-row components and do not trigger any bulk actions UI.
 
-**User-visible outcome:** Opening the site while signed out always shows the Features + Sign in landing screen immediately and consistently; “Access Denied” never appears on refresh/initial load, and any auth failure during startup logs the user out back to the signed-out landing screen.
+**User-visible outcome:** In List view, each task row shows a single checkbox for marking a task complete/reopen, with no duplicate or bulk-select checkbox and no bulk-selection actions bar appearing.

@@ -1,47 +1,42 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T13:08:59.678Z",
+  "generatedAt": "2026-02-08T14:06:26.965Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 2,
     "implemented": 2,
     "items": [
       {
-        "id": "REQ-28",
-        "summary": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
+        "id": "REQ-31",
+        "summary": "In the List view task rows, remove the left-side (bulk-select) checkbox (the first/left checkbox marked in red in the provided screenshot) so that each task row shows only one checkbox: the task completion checkbox.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/components/Tasks/TaskItem.tsx",
+          "frontend/src/components/Tasks/TaskList.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/App.tsx"
+          "frontend/src/components/Tasks/TaskItem.tsx",
+          "frontend/src/components/Tasks/TaskList.tsx"
         ]
       },
       {
-        "id": "REQ-29",
-        "summary": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
+        "id": "REQ-32",
+        "summary": "Disable or remove bulk-selection wiring from the List view so the removed bulk-select checkbox is not passed/rendered via props (e.g., stop passing selection props into task-row components) and the bulk actions bar does not appear due to leftover selection state.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/utils/isAuthorizationError.ts",
-          "frontend/src/App.tsx"
+          "frontend/src/components/Tasks/TaskPage.tsx",
+          "frontend/src/components/Tasks/TaskList.tsx",
+          "frontend/src/components/Tasks/TaskItem.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/utils/isAuthorizationError.ts",
-          "frontend/src/App.tsx"
+          "frontend/src/components/Tasks/TaskPage.tsx",
+          "frontend/src/components/Tasks/TaskList.tsx",
+          "frontend/src/components/Tasks/TaskItem.tsx"
         ]
-      },
-      {
-        "id": "REQ-30",
-        "summary": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it (keep the file removed or as a non-renderable stub, but ensure it cannot produce UI).",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/components/Error/AccessDeniedScreen.tsx"
-        ],
-        "matchedFiles": []
       }
     ]
   },
@@ -50,8 +45,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/App.tsx",
-    "frontend/src/utils/isAuthorizationError.ts",
+    "frontend/src/components/Tasks/TaskItem.tsx",
+    "frontend/src/components/Tasks/TaskList.tsx",
+    "frontend/src/components/Tasks/TaskPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

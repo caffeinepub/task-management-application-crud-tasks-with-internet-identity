@@ -1,58 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Eliminate Access Denied flash and force SignedOut landing on initial load",
+  "title": "Remove bulk-select checkbox and bulk-selection wiring from List view task rows",
   "requirements": [
     {
-      "id": "REQ-28",
-      "summary": "Always render the signed-out landing (Features + Sign in) for unauthenticated users during initial load, with no Access Denied UI at any time while signed out.",
+      "id": "REQ-31",
+      "summary": "Remove the left-side bulk-select checkbox from List view task rows so only the completion checkbox remains.",
       "acceptanceCriteria": [
-        "Open the site in a fresh Incognito window: the first screen shown is the Features + Sign in landing screen (SignedOutScreen).",
-        "At no point during initial load (including while auth state initializes) does an “Access Denied” screen appear for a signed-out user.",
-        "No route/state in the app renders or navigates to an Access Denied screen/component for a signed-out user."
+        "In List view, each task row renders exactly one checkbox control (the completion checkbox).",
+        "The leftmost/bulk-select checkbox is not rendered anywhere in the task list rows.",
+        "There is no duplicate checkbox UI in the task list rows (matches the screenshot intent).",
+        "The remaining checkbox continues to toggle task completion/reopen as it did previously."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/Tasks/TaskItem.tsx",
           "operation": "modify",
-          "description": "Change top-level initial render logic so that while Internet Identity is initializing and the user is not yet authenticated, the app renders SignedOutScreen (Features + Sign in) instead of any intermediate state that could expose protected UI or an authorization error/denied state. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "summary": "Harden authorization failure handling so any auth/permission-related startup error triggers logout, cache clearing, and returns to SignedOutScreen without relying on a single error string.",
-      "acceptanceCriteria": [
-        "If the backend returns an authorization failure during profile loading, the app logs the user out (clears Internet Identity session in-app) and shows the signed-out landing screen instead of showing an Access Denied page.",
-        "The authorization error handling does not rely on a single exact error string; common authorization/permission-denied variants are handled consistently.",
-        "After the session is cleared due to an auth error, React Query caches are cleared/invalidated so protected queries do not keep failing in a loop."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/utils/isAuthorizationError.ts",
-          "operation": "create",
-          "description": "Add a small utility that detects authorization/permission-denied failures robustly across common variants (e.g., unauthorized/forbidden/permission denied/not authorized/authentication required), supporting different error shapes. Verify the component's usage instructions before implementing."
+          "description": "Remove the conditional selection checkbox block and any selection-related props usage so each task row renders only the completion checkbox while keeping the existing completion toggle behavior intact."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/Tasks/TaskList.tsx",
           "operation": "modify",
-          "description": "Replace the current 'Unauthorized' substring check with the new authorization error detector; on detected auth failure during authenticated startup (e.g., profile load), clear the Internet Identity session via useInternetIdentity.clear() and clear/invalidate React Query caches to prevent retry loops, then ensure the signed-out landing is shown. Verify the component's usage instructions before implementing."
+          "description": "Update TaskItem rendering in the list to stop passing any selection-related props so the task row cannot render a bulk-select checkbox."
         }
       ]
     },
     {
-      "id": "REQ-30",
-      "summary": "Remove any renderable Access Denied screen from the runtime bundle and ensure no code path can import/render it.",
+      "id": "REQ-32",
+      "summary": "Disable bulk-selection wiring in List view so selection props/state are not used and the bulk actions bar never appears from leftover selection state.",
       "acceptanceCriteria": [
-        "There is no working AccessDeniedScreen UI that can be rendered by the app in any state.",
-        "A code search for rendering/route usage of an Access Denied screen returns no active usages (imports/references that can render UI).",
-        "Refreshing the app repeatedly while signed out never shows an Access Denied card/page."
+        "Task rows do not receive or depend on selection props for rendering a selection checkbox.",
+        "The bulk actions selection UI does not appear as a result of any default/leftover selection state after this change.",
+        "No user-facing text regressions are introduced; any visible labels remain in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/Error/AccessDeniedScreen.tsx",
-          "operation": "delete",
-          "description": "Delete the AccessDeniedScreen implementation file so it cannot be bundled or rendered at runtime; remove any remaining imports/usages elsewhere as needed to keep the app compiling and to ensure no renderable Access Denied UI exists."
+          "path": "frontend/src/components/Tasks/TaskPage.tsx",
+          "operation": "modify",
+          "description": "Remove bulk-selection state and handlers (selectedTasks, select/clear callbacks), stop conditionally rendering TaskBulkActionsBar, and stop passing selection props into TaskList so no leftover selection state can trigger bulk actions UI."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskList.tsx",
+          "operation": "modify",
+          "description": "Remove selection-related props from TaskList’s public interface and internal TaskItem prop wiring so List view no longer depends on selection state for rendering."
+        },
+        {
+          "path": "frontend/src/components/Tasks/TaskItem.tsx",
+          "operation": "modify",
+          "description": "Remove selection-related props (isSelected/onSelect) from TaskItem’s public interface so the row component no longer supports selection-checkbox rendering via props."
         }
       ]
     }

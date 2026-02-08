@@ -15,11 +15,9 @@ interface TaskItemProps {
   task: Task;
   onEdit: (taskId: bigint) => void;
   onDuplicate?: (task: Task) => void;
-  isSelected?: boolean;
-  onSelect?: (taskId: bigint, selected: boolean) => void;
 }
 
-export default function TaskItem({ task, onEdit, onDuplicate, isSelected, onSelect }: TaskItemProps) {
+export default function TaskItem({ task, onEdit, onDuplicate }: TaskItemProps) {
   const { mutate: updateStatus, isPending: isUpdatingStatus } = useUpdateTaskStatus();
   const { mutate: deleteTask, isPending: isDeleting } = useDeleteTask();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -66,16 +64,6 @@ export default function TaskItem({ task, onEdit, onDuplicate, isSelected, onSele
         } ${isOverdue ? 'border-l-4 border-l-destructive bg-destructive/5' : ''}`}
       >
         <div className="flex items-start gap-3">
-          {onSelect && (
-            <div className="pt-1">
-              <Checkbox
-                checked={isSelected}
-                onCheckedChange={(checked) => onSelect(task.id, !!checked)}
-                disabled={isPending}
-                className="h-5 w-5"
-              />
-            </div>
-          )}
           <div className="pt-1">
             <Checkbox
               checked={task.status === TaskStatus.completed}

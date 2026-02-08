@@ -1,18 +1,20 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
+  "projectStateVersion": 17,
   "summary": "Task management application project expanded toward a “Task Manager 2.0” feature set (SaaS-like UX) while remaining on the Caffeine-supported stack (Motoko backend + React/Vite + TypeScript). Real-time collaboration is replaced with periodic refresh + React Query cache updates, and multi-user support is principal-based via Internet Identity.",
   "architectural_notes": [
     "Caffeine target stack constraint: Motoko backend + React (Vite) + TypeScript frontend; no Next.js/Prisma/Postgres/NextAuth/Node/Redis/WebSockets/Pusher/Ably/Docker.",
     "Real-time collaboration is replaced with periodic refresh + React Query refetching/cache updates.",
     "Multi-user is implemented via Internet Identity principals; data isolation and (future) workspace concepts are principal-based.",
-    "Remove the AccessDeniedScreen component entirely; unauthenticated users should start on the Login/Register landing page instead of ever seeing an Access Denied page."
+    "Remove the AccessDeniedScreen component entirely; unauthenticated users should start on the Login/Register landing page instead of ever seeing an Access Denied page.",
+    "Task schema expansion planned: add duration_hours (required) and completed_at (auto-set on completion).",
+    "Implement multi-user task comments with stable persistence; each comment stores text, author identity (name/avatar), and created_at; display chronologically with empty state."
   ],
   "known_issues": [
     "Users report being unable to create tasks (tasks are not saving).",
     "Access Denied screen is still appearing on initial load; user wants the first page to always be the Features + Login/Register landing page."
   ],
-  "isFixRequest": true,
+  "isFixRequest": false,
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-based-sign-in-and-sign-out-in-the-ui-and-gate-task-data-so-each-authenticated-principal-only-sees-and-edits-their-own-tasks",
@@ -197,6 +199,22 @@
         "REQ-29"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-the-list-view-task-rows-remove-the-left-side-bulk-select-checkbox-the-first-left-checkbox-marked-in-red-in-the-provided-screenshot-so-that-each-task-row-shows-only-one-checkbox-the-task-completion-checkbox",
+      "title": "In the List view task rows, remove the left-side (bulk-select) checkbox (the first/left checkbox marked in red in the provided screenshot) so that each task row shows only one checkbox: the task completion checkbox.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-disable-or-remove-bulk-selection-wiring-from-the-list-view-so-the-removed-bulk-select-checkbox-is-not-passed-rendered-via-props-e-g-stop-passing-selection-props-into-task-row-components-and-the-bulk-actions-bar-does-not-appear-due-to-leftover-selection-state",
+      "title": "Disable or remove bulk-selection wiring from the List view so the removed bulk-select checkbox is not passed/rendered via props (e.g., stop passing selection props into task-row components) and the bulk actions bar does not appear due to leftover selection state.",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -314,6 +332,48 @@
       "reqIds": [
         "REQ-30"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-21",
+      "summary": "Remove the left-side (bulk-select) checkbox from each task row, leaving only the task completion checkbox; ensure no duplicate checkboxes remain in list view.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-22",
+      "summary": "Add an in-task comments system in the Task Detail drawer/modal: add comment box + submit (optional Enter-to-submit), chronological list with empty state, and store comment text, author (name/avatar), and timestamp; support multiple users.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-23",
+      "summary": "Add a completed_at datetime field: automatically set when status becomes Completed; display 'Completed on: <date time>' in task card and task details only when completed.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-24",
+      "summary": "Add required Task Duration (duration_hours) field to create/edit task (accept decimals) and display on task card as meta (e.g., ⏱ 3h); backend schema update included.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-25",
+      "summary": "Update task card layout to include: Title + Status/Priority badges, Tags, and bottom meta row (Due date, Duration hours, Completed date if completed, Comment count badge).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-26",
+      "summary": "Add task completion micro-interactions: checkbox tick animation, slight card fade, light confetti/success burst, and smooth move to Completed column in Kanban (500–900ms).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-27",
+      "summary": "Add modern UX feedback: toast notifications (Comment added / Task completed / Task updated) plus maintain SaaS-quality responsiveness and skeleton loaders where appropriate.",
+      "reqIds": [],
       "status": "pending"
     }
   ],

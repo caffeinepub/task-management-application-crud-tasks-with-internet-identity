@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-ensure-that-on-initial-load-the-app-always-renders-the-signed-out-landing-screen-features-sign-in-when-the-user-is-not-authenticated-and-never-renders-any-access-denied-ui-while-signed-out-including-transient-flash-states-during-initialization",
-      "featureTitle": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
+      "featureId": "feature-in-the-list-view-task-rows-remove-the-left-side-bulk-select-checkbox-the-first-left-checkbox-marked-in-red-in-the-provided-screenshot-so-that-each-task-row-shows-only-one-checkbox-the-task-completion-checkbox",
+      "featureTitle": "In the List view task rows, remove the left-side (bulk-select) checkbox (the first/left checkbox marked in red in the provided screenshot) so that each task row shows only one checkbox: the task completion checkbox.",
       "files": [
-        "frontend/src/App.tsx"
+        "frontend/src/components/Tasks/TaskItem.tsx",
+        "frontend/src/components/Tasks/TaskList.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -16,16 +17,17 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-28"
+        "REQ-31"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-harden-the-top-level-authorization-failure-handling-so-that-any-authorization-related-error-encountered-during-authenticated-startup-e-g-while-fetching-the-current-user-profile-clears-the-session-and-returns-the-user-to-the-signed-out-landing-screen-even-if-the-error-message-does-not-exactly-match-the-current-unauthorized-substring-check",
-      "featureTitle": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
+      "featureId": "feature-disable-or-remove-bulk-selection-wiring-from-the-list-view-so-the-removed-bulk-select-checkbox-is-not-passed-rendered-via-props-e-g-stop-passing-selection-props-into-task-row-components-and-the-bulk-actions-bar-does-not-appear-due-to-leftover-selection-state",
+      "featureTitle": "Disable or remove bulk-selection wiring from the List view so the removed bulk-select checkbox is not passed/rendered via props (e.g., stop passing selection props into task-row components) and the bulk actions bar does not appear due to leftover selection state.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/utils/isAuthorizationError.ts"
+        "frontend/src/components/Tasks/TaskItem.tsx",
+        "frontend/src/components/Tasks/TaskList.tsx",
+        "frontend/src/components/Tasks/TaskPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -36,7 +38,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-29"
+        "REQ-32"
       ],
       "confidence": "high"
     }
