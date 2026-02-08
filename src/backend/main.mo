@@ -1,4 +1,4 @@
-import Migration "migration";
+
 import Map "mo:core/Map";
 import Text "mo:core/Text";
 import Int "mo:core/Int";
@@ -12,7 +12,7 @@ import List "mo:core/List";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-(with migration = Migration.run)
+
 actor {
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);

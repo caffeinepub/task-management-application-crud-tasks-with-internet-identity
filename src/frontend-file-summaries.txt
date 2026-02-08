@@ -1,5 +1,5 @@
 {
-  "frontend/src/App.tsx": "Main application component that handles authentication state, profile setup flow, and renders the appropriate screen (signed out, profile setup, or task management page).",
+  "frontend/src/App.tsx": "Main application component that always shows SignedOutScreen during initialization or when unauthenticated, uses robust authorization error detection to clear session on auth failures, and manages profile setup flow for authenticated users without ever displaying an Access Denied screen.",
   "frontend/src/components/Auth/LoginButton.tsx": "Login/logout button component that uses Internet Identity and clears React Query cache on logout.",
   "frontend/src/components/Auth/SignedOutScreen.tsx": "Landing page for unauthenticated users with app features list, empty-state illustration, and sign-in button.",
   "frontend/src/components/Auth/ProfileSetupDialog.tsx": "Modal dialog for first-time users to enter their name after authentication, with close button disabled to ensure profile completion.",
@@ -13,7 +13,7 @@
   "frontend/src/components/Tasks/TaskToolbar.tsx": "Advanced toolbar with search, sorting (due date/priority/created/alphabetical), status/priority/due-date filters, quick filter chips, and clear filters button.",
   "frontend/src/components/Tasks/taskUtils.ts": "Pure utility functions for filtering, sorting, due-date badge computation, overdue detection, and dashboard metrics calculation supporting Task Manager 2.0 features.",
   "frontend/src/components/Shared/ConfirmDialog.tsx": "Reusable confirmation dialog component for destructive actions like task deletion.",
-  "frontend/src/hooks/useCurrentUserProfile.ts": "React Query hooks for fetching and saving the authenticated user's profile.",
+  "frontend/src/hooks/useCurrentUserProfile.ts": "React Query hooks for fetching and saving the authenticated user's profile, gated to only run when an authenticated identity exists and using principal-scoped queryKey to prevent cross-session cache issues.",
   "frontend/src/hooks/tasks/useTasks.ts": "React Query hook for fetching tasks with periodic refresh (30s interval) and refetch on window focus without disruptive loading states.",
   "frontend/src/hooks/tasks/useCreateTask.ts": "React Query mutation hook for creating tasks with required dueDate, priority, and tags, with normalized error handling.",
   "frontend/src/hooks/tasks/useUpdateTask.ts": "React Query mutation hook for updating tasks with required dueDate, priority, and tags, with normalized error handling.",
@@ -31,5 +31,6 @@
   "frontend/src/components/Tasks/CommandPalette.tsx": "Keyboard-accessible command palette for quick actions (new task, search, toggle view) with keyboard shortcut hints.",
   "frontend/src/hooks/useKeyboardShortcuts.ts": "Custom hook for keyboard shortcuts (N for new task, F for search, Cmd/Ctrl+K for command palette) that only triggers outside input fields.",
   "frontend/src/hooks/tasks/useUpdateTaskStatus.ts": "React Query mutation hook for updating task status (open/inProgress/completed/archived) with cache invalidation.",
-  "frontend/src/hooks/useDarkMode.ts": "Custom hook for toggling dark mode with localStorage persistence and system preference detection."
+  "frontend/src/hooks/useDarkMode.ts": "Custom hook for toggling dark mode with localStorage persistence and system preference detection.",
+  "frontend/src/utils/isAuthorizationError.ts": "Utility function that robustly detects authorization/permission-denied failures across common error variants (unauthorized, forbidden, permission denied, etc.) supporting different error shapes (Error objects, strings, objects with message property)."
 }

@@ -1,234 +1,57 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T12:23:07.571Z",
+  "generatedAt": "2026-02-08T13:08:59.678Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 12,
-    "implemented": 9,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "Fix backend persistence so that tasks and user profiles reliably persist across calls and canister upgrades, using stable storage for per-principal task maps and per-principal next task IDs; ensure tasks created via createTask always appear in subsequent getTasks() calls for the same authenticated principal.",
-        "status": "unknown",
-        "plannedFiles": [],
+        "id": "REQ-28",
+        "summary": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-29",
+        "summary": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/utils/isAuthorizationError.ts",
+          "frontend/src/App.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/utils/isAuthorizationError.ts",
+          "frontend/src/App.tsx"
+        ]
+      },
+      {
+        "id": "REQ-30",
+        "summary": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it (keep the file removed or as a non-renderable stub, but ensure it cannot produce UI).",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/Error/AccessDeniedScreen.tsx"
+        ],
         "matchedFiles": []
-      },
-      {
-        "id": "REQ-12",
-        "summary": "Upgrade the backend task data model and APIs to support Task Manager 2.0 fields per task: required dueDate, status (Open/In Progress/Completed/Archived), priority (Low/Medium/High/Urgent), tags (array of text), createdAt/updatedAt timestamps, createdBy (principal), optional assignedTo (principal, future use), and a per-user persisted ordering key for Kanban (e.g., per-status order index).",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-13",
-        "summary": "Add subtasks with backend persistence: each task supports an ordered checklist of subtasks (id, title, isCompleted). Provide APIs to add/update/delete subtasks and toggle completion, and include subtask data when fetching tasks.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-14",
-        "summary": "Update the task create/edit UI to match the upgraded task model: make due date a required field; add status, priority, and tags inputs; display created/updated metadata where appropriate; ensure all user-facing validation and error text is in English.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Tasks/TaskForm.tsx",
-          "frontend/src/hooks/tasks/useCreateTask.ts",
-          "frontend/src/hooks/tasks/useUpdateTask.ts",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Tasks/TaskForm.tsx",
-          "frontend/src/hooks/tasks/useCreateTask.ts",
-          "frontend/src/hooks/tasks/useUpdateTask.ts",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-15",
-        "summary": "Implement due-date intelligence in the UI: show dynamic countdown badges for tasks (Today, Tomorrow, Due in X days, X days overdue, Done) and visually highlight overdue tasks (red left border + light red background) in both List and Kanban cards; ensure badge text updates correctly based on current date.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-          "frontend/src/index.css"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx"
-        ]
-      },
-      {
-        "id": "REQ-16",
-        "summary": "Expand task organization features: add advanced filtering (status including Archived, due-date ranges: Today/This Week/Overdue, priority, tags) and sorting (Due Date default, Priority, Created Date, Alphabetical) plus quick filter chips (Overdue, Due Today, High Priority, Completed).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskToolbar.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskToolbar.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-17",
-        "summary": "Upgrade Kanban to support multiple columns by status (Open, In Progress, Completed, Archived as appropriate) with drag-and-drop between columns; on drop, update the task status and persist per-user ordering so the same order is restored after refresh.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/tasks/useUpdateTaskStatus.ts",
-          "frontend/src/hooks/tasks/useUpdateTaskOrder.ts",
-          "frontend/src/components/Tasks/TaskKanbanView.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/tasks/useUpdateTaskStatus.ts",
-          "frontend/src/components/Tasks/TaskKanbanView.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-18",
-        "summary": "Add dashboard summary metrics for the signed-in user: open tasks count, completed today, overdue count, and tasks due this week, computed from the user’s tasks and displayed prominently on the task page.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Tasks/taskUtils.ts",
-          "frontend/src/components/Tasks/TaskPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-19",
-        "summary": "Add modern productivity UX (UI-only where necessary): quick add / command palette, keyboard shortcuts (N new task, F search, K command palette), inline edit for common fields, duplicate task, archive/unarchive task, bulk select with bulk actions (complete, archive, delete), and lightweight notification banners for due soon/overdue.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useKeyboardShortcuts.ts",
-          "frontend/src/components/Tasks/CommandPalette.tsx",
-          "frontend/src/components/Tasks/DueAlertsBanner.tsx",
-          "frontend/src/components/Tasks/TaskBulkActionsBar.tsx",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx",
-          "frontend/src/hooks/tasks/useCreateTask.ts",
-          "frontend/src/hooks/tasks/useDeleteTask.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useKeyboardShortcuts.ts",
-          "frontend/src/components/Tasks/CommandPalette.tsx",
-          "frontend/src/components/Tasks/DueAlertsBanner.tsx",
-          "frontend/src/components/Tasks/TaskBulkActionsBar.tsx",
-          "frontend/src/components/Tasks/TaskItem.tsx",
-          "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx",
-          "frontend/src/hooks/tasks/useCreateTask.ts",
-          "frontend/src/hooks/tasks/useDeleteTask.ts"
-        ]
-      },
-      {
-        "id": "REQ-20",
-        "summary": "Replace real-time collaboration with periodic refresh: configure task fetching to automatically refresh on an interval and on window focus, while maintaining good UX (no disruptive loading states) and ensuring React Query cache stays consistent after mutations.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/tasks/useTasks.ts",
-          "frontend/src/hooks/tasks/useUpdateTask.ts",
-          "frontend/src/hooks/tasks/useToggleCompleteTask.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/tasks/useTasks.ts",
-          "frontend/src/hooks/tasks/useUpdateTask.ts",
-          "frontend/src/hooks/tasks/useToggleCompleteTask.ts"
-        ]
-      },
-      {
-        "id": "REQ-21",
-        "summary": "Improve overall UX polish: add loading skeletons for task lists/Kanban, responsive layout refinements for mobile, and an optional dark mode toggle that uses the existing theme token system.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/Tasks/TaskListSkeleton.tsx",
-          "frontend/src/components/Tasks/TaskKanbanSkeleton.tsx",
-          "frontend/src/components/Tasks/TaskList.tsx",
-          "frontend/src/components/Tasks/TaskKanbanView.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx",
-          "frontend/src/hooks/useDarkMode.ts",
-          "frontend/src/components/Layout/Header.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/Tasks/TaskListSkeleton.tsx",
-          "frontend/src/components/Tasks/TaskKanbanSkeleton.tsx",
-          "frontend/src/components/Tasks/TaskList.tsx",
-          "frontend/src/components/Tasks/TaskKanbanView.tsx",
-          "frontend/src/components/Tasks/TaskPage.tsx",
-          "frontend/src/hooks/useDarkMode.ts",
-          "frontend/src/components/Layout/Header.tsx"
-        ]
-      },
-      {
-        "id": "REQ-22",
-        "summary": "Add a custom empty-state illustration asset and render it in the unauthenticated landing screen and/or the tasks empty state (when there are no tasks), served as a static frontend asset (do not route through the backend).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png",
-          "frontend/src/components/Tasks/TaskList.tsx",
-          "frontend/src/components/Auth/SignedOutScreen.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png",
-          "frontend/src/components/Tasks/TaskList.tsx",
-          "frontend/src/components/Auth/SignedOutScreen.tsx"
-        ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/empty-state-clipboard.dim_1200x800.png",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/Auth/SignedOutScreen.tsx",
-    "frontend/src/components/Layout/Header.tsx",
-    "frontend/src/components/Tasks/CommandPalette.tsx",
-    "frontend/src/components/Tasks/DueAlertsBanner.tsx",
-    "frontend/src/components/Tasks/TaskBulkActionsBar.tsx",
-    "frontend/src/components/Tasks/TaskForm.tsx",
-    "frontend/src/components/Tasks/TaskItem.tsx",
-    "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-    "frontend/src/components/Tasks/TaskKanbanSkeleton.tsx",
-    "frontend/src/components/Tasks/TaskKanbanView.tsx",
-    "frontend/src/components/Tasks/TaskList.tsx",
-    "frontend/src/components/Tasks/TaskListSkeleton.tsx",
-    "frontend/src/components/Tasks/TaskPage.tsx",
-    "frontend/src/components/Tasks/TaskToolbar.tsx",
-    "frontend/src/components/Tasks/taskUtils.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/tasks/useCreateTask.ts",
-    "frontend/src/hooks/tasks/useDeleteTask.ts",
-    "frontend/src/hooks/tasks/useTasks.ts",
-    "frontend/src/hooks/tasks/useToggleCompleteTask.ts",
-    "frontend/src/hooks/tasks/useUpdateTask.ts",
-    "frontend/src/hooks/tasks/useUpdateTaskStatus.ts",
-    "frontend/src/hooks/useDarkMode.ts",
-    "frontend/src/hooks/useKeyboardShortcuts.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/utils/isAuthorizationError.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,38 +1,44 @@
+import { useEffect, useRef } from 'react';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/useCurrentUserProfile';
+import { useQueryClient } from '@tanstack/react-query';
+import { isAuthorizationError } from './utils/isAuthorizationError';
 import SignedOutScreen from './components/Auth/SignedOutScreen';
 import ProfileSetupDialog from './components/Auth/ProfileSetupDialog';
 import TaskPage from './components/Tasks/TaskPage';
 import Header from './components/Layout/Header';
 import Footer from './components/Layout/Footer';
-import AccessDeniedScreen from './components/Error/AccessDeniedScreen';
 
 export default function App() {
-  const { identity, loginStatus } = useInternetIdentity();
+  const { identity, loginStatus, clear, isInitializing } = useInternetIdentity();
   const { data: userProfile, isLoading: profileLoading, isFetched, error } = useGetCallerUserProfile();
+  const queryClient = useQueryClient();
+  const hasHandledAuthError = useRef(false);
 
   const isAuthenticated = !!identity;
-  const isInitializing = loginStatus === 'initializing';
 
-  // Show access denied if there's an authorization error
-  if (error && error.message.includes('Unauthorized')) {
-    return <AccessDeniedScreen />;
-  }
+  // Handle authorization errors by clearing session and showing signed-out screen
+  useEffect(() => {
+    if (isAuthenticated && error && isAuthorizationError(error) && !hasHandledAuthError.current) {
+      hasHandledAuthError.current = true;
+      const handleAuthError = async () => {
+        await clear();
+        queryClient.clear();
+      };
+      handleAuthError();
+    }
+  }, [isAuthenticated, error, clear, queryClient]);
 
-  // Show loading state during initialization
-  if (isInitializing) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent"></div>
-          <p className="mt-4 text-muted-foreground">Initializing...</p>
-        </div>
-      </div>
-    );
-  }
+  // Reset the error handler flag when user logs out
+  useEffect(() => {
+    if (!isAuthenticated) {
+      hasHandledAuthError.current = false;
+    }
+  }, [isAuthenticated]);
 
-  // Show signed out screen if not authenticated
-  if (!isAuthenticated) {
+  // Show signed-out landing screen during initialization or when not authenticated
+  // This prevents any Access Denied flash during initial load
+  if (isInitializing || !isAuthenticated) {
     return <SignedOutScreen />;
   }
 

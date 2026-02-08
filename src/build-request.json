@@ -1,240 +1,76 @@
 {
   "kind": "build_request",
-  "title": "Task Manager 2.0: expanded task model (status/priority/tags/subtasks), advanced UI (filters, Kanban drag-drop, dashboard, shortcuts), and stable persistence",
-  "priority": "normal",
+  "title": "Fix initial load to always show Features + Login screen (eliminate Access Denied flash)",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "Fix backend persistence so that tasks and user profiles reliably persist across calls and canister upgrades, using stable storage for per-principal task maps and per-principal next task IDs; ensure tasks created via createTask always appear in subsequent getTasks() calls for the same authenticated principal.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "Users report being unable to create tasks (tasks are not saving)."
-        ]
-      },
-      "acceptanceCriteria": [
-        "After calling createTask, a subsequent getTasks() from the same principal returns the created task without requiring a reload or any special ordering call.",
-        "After an upgrade, previously created tasks and saved user profiles are still present for the same principal.",
-        "If an upgrade requires state transformation, add backend/migration.mo following the conditional migration policy; if not required, do not add a migration file."
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Upgrade the backend task data model and APIs to support Task Manager 2.0 fields per task: required dueDate, status (Open/In Progress/Completed/Archived), priority (Low/Medium/High/Urgent), tags (array of text), createdAt/updatedAt timestamps, createdBy (principal), optional assignedTo (principal, future use), and a per-user persisted ordering key for Kanban (e.g., per-status order index).",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes an API shape that allows the frontend to create/update tasks including: status, priority, dueDate (required), and tags.",
-        "Existing tasks (created before this change) remain readable; any missing new fields are given safe defaults during read or via migration.",
-        "All task CRUD operations remain scoped to the authenticated caller (principal-based isolation)."
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "text": "Add subtasks with backend persistence: each task supports an ordered checklist of subtasks (id, title, isCompleted). Provide APIs to add/update/delete subtasks and toggle completion, and include subtask data when fetching tasks.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A user can add multiple subtasks to a task, mark them complete/incomplete, edit titles, and delete subtasks; these changes persist and are returned by getTasks().",
-        "Subtask operations are authorized the same way as tasks (only the task owner principal can modify)."
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "text": "Update the task create/edit UI to match the upgraded task model: make due date a required field; add status, priority, and tags inputs; display created/updated metadata where appropriate; ensure all user-facing validation and error text is in English.",
+      "id": "REQ-28",
+      "text": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-messages"
         ],
         "quotes": [
-          "1 2 3"
+          "still come same issue fix , i want first page features page and login page",
+          "yes fix"
         ]
       },
       "acceptanceCriteria": [
-        "The task form cannot be submitted without a due date; the UI shows an English validation message for missing required fields.",
-        "The task form supports editing status, priority, and tags, and saving updates reflects immediately in the list/Kanban views.",
-        "Any backend validation failures are shown in the form without closing it (retain existing improved mutation error UX)."
+        "Open the site in a fresh Incognito window: the first screen shown is the Features + Sign in landing screen (SignedOutScreen).",
+        "At no point during initial load (including while auth state initializes) does an “Access Denied” screen appear for a signed-out user.",
+        "No route/state in the app renders or navigates to an Access Denied screen/component for a signed-out user."
       ]
     },
     {
-      "id": "REQ-15",
-      "text": "Implement due-date intelligence in the UI: show dynamic countdown badges for tasks (Today, Tomorrow, Due in X days, X days overdue, Done) and visually highlight overdue tasks (red left border + light red background) in both List and Kanban cards; ensure badge text updates correctly based on current date.",
+      "id": "REQ-29",
+      "text": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-messages"
         ],
         "quotes": [
-          "1 2 3"
+          "still come same issue fix , i want first page features page and login page"
         ]
       },
       "acceptanceCriteria": [
-        "Tasks display the correct badge text and color based on due date and completion status, matching the requested labels (e.g., \"Due today\", \"Tomorrow\", \"2 days left\", \"3 days overdue\", \"Done\").",
-        "Overdue tasks that are not completed are visually highlighted in both list items and Kanban cards.",
-        "Badge logic works for tasks with due dates in the past/future and for completed tasks."
+        "If the backend returns an authorization failure during profile loading, the app logs the user out (clears Internet Identity session in-app) and shows the signed-out landing screen instead of showing an Access Denied page.",
+        "The authorization error handling does not rely on a single exact error string; common authorization/permission-denied variants are handled consistently.",
+        "After the session is cleared due to an auth error, React Query caches are cleared/invalidated so protected queries do not keep failing in a loop."
       ]
     },
     {
-      "id": "REQ-16",
-      "text": "Expand task organization features: add advanced filtering (status including Archived, due-date ranges: Today/This Week/Overdue, priority, tags) and sorting (Due Date default, Priority, Created Date, Alphabetical) plus quick filter chips (Overdue, Due Today, High Priority, Completed).",
+      "id": "REQ-30",
+      "text": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it (keep the file removed or as a non-renderable stub, but ensure it cannot produce UI).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "recent-messages"
         ],
         "quotes": [
-          "1 2 3"
+          "These images ... confirm the Access Denied screen is still showing on first load."
         ]
       },
       "acceptanceCriteria": [
-        "Users can filter tasks by status (including Archived), due-date range (Today/This Week/Overdue), priority, and tags, and can search title/description.",
-        "Users can sort by Due Date (default), Priority, Created Date, and Alphabetical, with ascending/descending where applicable.",
-        "Quick filter chips apply and clear the corresponding filters, and the results are consistent across List and Kanban views."
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "text": "Upgrade Kanban to support multiple columns by status (Open, In Progress, Completed, Archived as appropriate) with drag-and-drop between columns; on drop, update the task status and persist per-user ordering so the same order is restored after refresh.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Users can drag a task card between Kanban columns; dropping updates task status and the UI reflects the change immediately.",
-        "Within a column, users can reorder tasks via drag-and-drop and the order persists after a full page reload.",
-        "The backend stores and returns enough ordering information to restore per-user Kanban order reliably."
-      ]
-    },
-    {
-      "id": "REQ-18",
-      "text": "Add dashboard summary metrics for the signed-in user: open tasks count, completed today, overdue count, and tasks due this week, computed from the user’s tasks and displayed prominently on the task page.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The task page shows the four metrics (open, completed today, overdue, due this week) and they update when tasks are created/updated/completed.",
-        "Metric calculations treat dates consistently (use the same time unit conversions used elsewhere in the app)."
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "text": "Add modern productivity UX (UI-only where necessary): quick add / command palette, keyboard shortcuts (N new task, F search, K command palette), inline edit for common fields, duplicate task, archive/unarchive task, bulk select with bulk actions (complete, archive, delete), and lightweight notification banners for due soon/overdue.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Keyboard shortcuts work when the user is on the tasks page and do not interfere with typing inside form fields.",
-        "Users can select multiple tasks and apply bulk actions with clear confirmation for destructive actions.",
-        "Duplicate creates a new task with copied fields (title/description/due date/status/priority/tags) but a new id.",
-        "Archive/unarchive is supported in the UI and integrated into filters and Kanban columns as specified.",
-        "Due soon / overdue banners appear and can be dismissed for the current session."
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "text": "Replace real-time collaboration with periodic refresh: configure task fetching to automatically refresh on an interval and on window focus, while maintaining good UX (no disruptive loading states) and ensuring React Query cache stays consistent after mutations.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Tasks refresh automatically on a reasonable interval and on window focus, without flashing the entire page into a loading state.",
-        "After create/update/complete/reopen/delete operations, the tasks list/Kanban remains consistent with the backend without requiring a manual reload."
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "text": "Improve overall UX polish: add loading skeletons for task lists/Kanban, responsive layout refinements for mobile, and an optional dark mode toggle that uses the existing theme token system.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "While tasks are loading, the UI shows skeleton components instead of empty content.",
-        "The tasks page (toolbar, list, Kanban, form) remains usable on small screens without horizontal scrolling.",
-        "A dark mode toggle exists and correctly switches styles across primary screens using the existing CSS variables/theme tokens."
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "text": "Add a custom empty-state illustration asset and render it in the unauthenticated landing screen and/or the tasks empty state (when there are no tasks), served as a static frontend asset (do not route through the backend).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-1"
-        ],
-        "quotes": [
-          "1 2 3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The generated illustration is stored in frontend/public/assets/generated and is referenced directly by the React UI.",
-        "When the task list is empty, the UI shows an empty state that includes the illustration and clear English text prompting the user to create a task."
+        "There is no working AccessDeniedScreen UI that can be rendered by the app in any state.",
+        "A code search for rendering/route usage of an Access Denied screen returns no active usages (imports/references that can render UI).",
+        "Refreshing the app repeatedly while signed out never shows an Access Denied card/page."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor with all business logic in backend/main.mo; add backend/migration.mo only if required for upgrading existing state (conditional migration policy).",
-    "Do not edit any files under frontend/src/components/ui or other frontend immutablePaths; compose existing UI components instead.",
-    "Use English for all user-facing strings added or modified by this change.",
-    "No WebSockets or third-party real-time systems; implement periodic refresh using React Query only.",
-    "Authentication must remain Internet Identity; multi-user isolation must remain principal-based."
+    "Use English for any user-facing text.",
+    "Do not edit files under frontend/src/components/ui or any other paths listed in frontend.immutablePaths.",
+    "Keep the backend architecture as a single Motoko actor; only introduce migration.mo if a state upgrade is required (not expected for this UI/routing fix)."
   ],
   "nonGoals": [
-    "Implementing Google OAuth, email/password login, forgot-password flows, or any third-party authentication provider.",
-    "Adding external databases (PostgreSQL/Prisma/Redis) or moving to Next.js/Node/Express.",
-    "True real-time collaboration or presence indicators.",
-    "Team/workspace sharing of tasks between principals (future-ready fields are acceptable, but no cross-user sharing behavior now)."
+    "Adding new task-management features (Kanban, filters, etc.).",
+    "Changing the Internet Identity provider implementation details in frontend/src/hooks/useInternetIdentity.ts (immutable).",
+    "Adding third-party authentication or routing frameworks."
   ],
   "imageRequirements": {
-    "required": [
-      "Minimal flat-vector empty state illustration featuring a clipboard, checkmarks, and a small plant, in a green-forward palette (empty-state-clipboard.dim_1200x800.png)"
-    ],
+    "required": [],
     "edits": []
   },
   "userProfileUpdate": {

@@ -1,121 +1,24 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T12:23:07.568Z",
-  "summary": "Diff implements several Task Manager 2.0 frontend UX items (command palette, keyboard shortcuts, bulk actions, due-date badges/overdue styling, periodic refresh, skeletons, dark mode toggle, empty states referencing an illustration) and begins backend model expansion + a migration module. However, multiple core requirements are missing or only partially implemented based on the diff evidence, especially stable persistence across upgrades, subtasks APIs/UI, full task model API support (status/timestamps/ordering), and Kanban drag-drop with persisted ordering.",
+  "generatedAt": "2026-02-08T13:08:59.675Z",
+  "summary": "REQ-28 and REQ-29 appear implemented via App.tsx changes that (a) render SignedOutScreen during initialization/when unauthenticated to prevent transient Access Denied UI, and (b) clear the session + React Query cache on authorization-like errors using a broader matcher. REQ-30 is not satisfied because the diff provides evidence that a renderable AccessDeniedScreen still exists in the project state summaries, with no removal/stubbing shown.",
   "missing_requirements": [
     {
-      "id": "REQ-11",
-      "requirement": "Fix backend persistence so that tasks and user profiles reliably persist across calls and canister upgrades, using stable storage for per-principal task maps and per-principal next task IDs; ensure tasks created via createTask always appear in subsequent getTasks() calls for the same authenticated principal.",
-      "reason": "backend/main.mo shows in-memory Maps for userProfiles/nextTaskId/userTasks, but the diff snippet does not show any stable variables or preupgrade/postupgrade logic required for upgrade-safe persistence. Migration is added, but stable storage wiring is not evidenced.",
+      "id": "REQ-30",
+      "requirement": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it.",
+      "reason": "The diff does not remove or stub AccessDeniedScreen. The repository summary still describes a concrete, renderable AccessDeniedScreen component (“Error screen displayed when authorization fails or user lacks permissions.”), which conflicts with the requirement that no renderable implementation exist in the runtime bundle.",
       "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "requirement": "Upgrade the backend task data model and APIs to support Task Manager 2.0 fields (required dueDate, status, priority, tags, createdAt/updatedAt, createdBy, optional assignedTo, and per-user persisted ordering key for Kanban).",
-      "reason": "While backend types include the new fields, the frontend create/update hooks only pass title/description/dueDate/priority/tags and do not pass status (and no evidence they can set orderKey/assignedTo). Also taskUtils and UI still treat dueDate as possibly missing, conflicting with 'required dueDate'. Backend API shape for creating/updating status/orderKey is not evidenced in the diff beyond an updateTaskStatus method call.",
-      "evidence": [
-        "backend/main.mo",
-        "frontend/src/hooks/tasks/useCreateTask.ts",
-        "frontend/src/hooks/tasks/useUpdateTask.ts",
-        "frontend/src/components/Tasks/taskUtils.ts",
-        "frontend/src/components/Tasks/TaskForm.tsx"
-      ]
-    },
-    {
-      "id": "REQ-13",
-      "requirement": "Add subtasks with backend persistence and provide APIs to add/update/delete subtasks and toggle completion; include subtask data when fetching tasks.",
-      "reason": "Backend types include subtasks and nextSubtaskId, but the diff provides no evidence of any backend subtask CRUD APIs, nor any frontend UI/hooks for managing subtasks.",
-      "evidence": [
-        "backend/main.mo",
-        "backend/migration.mo"
-      ]
-    },
-    {
-      "id": "REQ-14",
-      "requirement": "Update the task create/edit UI to match upgraded task model: due date required; add status, priority, and tags inputs; display created/updated metadata; show backend validation failures in-form without closing.",
-      "reason": "Due date required validation is implemented, and priority/tags appear handled. However, although TaskForm has a status state, the submit handlers do not send status on create/update (only title/description/dueDate/priority/tags). Also no evidence of createdAt/updatedAt metadata display in the form/UI.",
-      "evidence": [
-        "frontend/src/components/Tasks/TaskForm.tsx",
-        "frontend/src/hooks/tasks/useCreateTask.ts",
-        "frontend/src/hooks/tasks/useUpdateTask.ts"
-      ]
-    },
-    {
-      "id": "REQ-16",
-      "requirement": "Add advanced filtering (status incl Archived, due-date ranges, priority, tags) and sorting plus quick filter chips (Overdue, Due Today, High Priority, Completed).",
-      "reason": "Status/priority/due-date filters and sorting are evidenced, but tags filtering UI is not evidenced (TaskPage passes tagsFilter: [] and taskUtils supports tagsFilter but no UI shown). Quick filter chips are mentioned in the truncated toolbar summary, but the provided TaskToolbar snippet does not show chip implementation, so it cannot be confirmed.",
-      "evidence": [
-        "frontend/src/components/Tasks/TaskPage.tsx",
-        "frontend/src/components/Tasks/TaskToolbar.tsx",
-        "frontend/src/components/Tasks/taskUtils.ts"
-      ]
-    },
-    {
-      "id": "REQ-17",
-      "requirement": "Upgrade Kanban to support drag-and-drop between columns and within-column reordering; persist per-user ordering so order is restored after refresh.",
-      "reason": "Kanban columns by status are implemented, but there is no evidence of drag-and-drop behavior or persisted ordering. TaskKanbanView only filters and maps tasks; no DnD library/handlers or orderKey usage is shown.",
-      "evidence": [
-        "frontend/src/components/Tasks/TaskKanbanView.tsx",
-        "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "requirement": "Add modern productivity UX: quick add/command palette, keyboard shortcuts, inline edit, duplicate, archive/unarchive, bulk select with bulk actions, and notification banners for due soon/overdue.",
-      "reason": "Command palette, keyboard shortcuts, duplicate, archive/unarchive, bulk actions, and due alerts banners are evidenced. Inline edit for common fields is not evidenced anywhere in the diff.",
-      "evidence": [
-        "frontend/src/components/Tasks/CommandPalette.tsx",
-        "frontend/src/hooks/useKeyboardShortcuts.ts",
-        "frontend/src/components/Tasks/TaskPage.tsx",
-        "frontend/src/components/Tasks/TaskItem.tsx",
-        "frontend/src/components/Tasks/DueAlertsBanner.tsx",
-        "frontend/src/components/Tasks/TaskBulkActionsBar.tsx"
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "requirement": "Add a custom empty-state illustration asset stored in frontend/public/assets/generated and reference it directly from the React UI.",
-      "reason": "UI references /assets/generated/empty-state-clipboard.dim_1200x800.png, but the diff does not show the actual image file being added under frontend/public/assets/generated.",
-      "evidence": [
-        "frontend/src/components/Auth/SignedOutScreen.tsx",
-        "frontend/src/components/Tasks/TaskList.tsx"
+        "frontend-file-summaries.txt (entry for frontend/src/components/Error/AccessDeniedScreen.tsx)"
       ]
     }
   ],
   "hallucinated_features": [],
   "confidence": 0.74,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Auth/SignedOutScreen.tsx",
-    "frontend/src/components/Layout/Header.tsx",
-    "frontend/src/components/Tasks/CommandPalette.tsx",
-    "frontend/src/components/Tasks/DueAlertsBanner.tsx",
-    "frontend/src/components/Tasks/TaskBulkActionsBar.tsx",
-    "frontend/src/components/Tasks/TaskForm.tsx",
-    "frontend/src/components/Tasks/TaskItem.tsx",
-    "frontend/src/components/Tasks/TaskKanbanCard.tsx",
-    "frontend/src/components/Tasks/TaskKanbanSkeleton.tsx",
-    "frontend/src/components/Tasks/TaskKanbanView.tsx",
-    "frontend/src/components/Tasks/TaskList.tsx",
-    "frontend/src/components/Tasks/TaskListSkeleton.tsx",
-    "frontend/src/components/Tasks/TaskPage.tsx",
-    "frontend/src/components/Tasks/TaskToolbar.tsx",
-    "frontend/src/components/Tasks/taskUtils.ts",
-    "frontend/src/hooks/tasks/useCreateTask.ts",
-    "frontend/src/hooks/tasks/useDeleteTask.ts",
-    "frontend/src/hooks/tasks/useTasks.ts",
-    "frontend/src/hooks/tasks/useToggleCompleteTask.ts",
-    "frontend/src/hooks/tasks/useUpdateTask.ts",
-    "frontend/src/hooks/tasks/useUpdateTaskStatus.ts",
-    "frontend/src/hooks/useDarkMode.ts",
-    "frontend/src/hooks/useKeyboardShortcuts.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/utils/isAuthorizationError.ts",
     "project_state.json"
   ]
 }

@@ -1,17 +1,18 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
+  "projectStateVersion": 15,
   "summary": "Task management application project expanded toward a “Task Manager 2.0” feature set (SaaS-like UX) while remaining on the Caffeine-supported stack (Motoko backend + React/Vite + TypeScript). Real-time collaboration is replaced with periodic refresh + React Query cache updates, and multi-user support is principal-based via Internet Identity.",
   "architectural_notes": [
     "Caffeine target stack constraint: Motoko backend + React (Vite) + TypeScript frontend; no Next.js/Prisma/Postgres/NextAuth/Node/Redis/WebSockets/Pusher/Ably/Docker.",
     "Real-time collaboration is replaced with periodic refresh + React Query refetching/cache updates.",
-    "Multi-user is implemented via Internet Identity principals; data isolation and (future) workspace concepts are principal-based."
+    "Multi-user is implemented via Internet Identity principals; data isolation and (future) workspace concepts are principal-based.",
+    "Remove the AccessDeniedScreen component entirely; unauthenticated users should start on the Login/Register landing page instead of ever seeing an Access Denied page."
   ],
   "known_issues": [
-    "Users report being unable to create tasks (tasks are not saving)."
+    "Users report being unable to create tasks (tasks are not saving).",
+    "Access Denied screen is still appearing on initial load; user wants the first page to always be the Features + Login/Register landing page."
   ],
   "isFixRequest": true,
-  "imageRequirements": "## Required Images\n- Minimal flat-vector empty state illustration featuring a clipboard, checkmarks, and a small plant, in a green-forward palette (empty-state-clipboard.dim_1200x800.png)",
   "existing_features": [
     {
       "id": "feature-implement-internet-identity-based-sign-in-and-sign-out-in-the-ui-and-gate-task-data-so-each-authenticated-principal-only-sees-and-edits-their-own-tasks",
@@ -140,6 +141,62 @@
         "REQ-22"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-app-entry-flow-so-unauthenticated-users-never-see-the-access-denied-screen-on-initial-load-and-are-shown-the-signed-out-login-register-landing-screen-instead",
+      "title": "Update the app entry flow so unauthenticated users never see the “Access Denied” screen on initial load and are shown the signed-out Login/Register landing screen instead.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-prevent-unauthorized-profile-loading-errors-from-triggering-the-access-denied-screen-while-the-user-is-signed-out-by-ensuring-the-current-user-profile-query-only-runs-when-an-authenticated-identity-is-present",
+      "title": "Prevent unauthorized profile-loading errors from triggering the “Access Denied” screen while the user is signed out by ensuring the current-user profile query only runs when an authenticated identity is present.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-the-top-level-rendering-logic-so-the-app-prioritizes-authentication-state-over-authorization-error-rendering-i-e-never-show-accessdeniedscreen-when-the-user-is-not-authenticated",
+      "title": "Adjust the top-level rendering logic so the app prioritizes authentication state over authorization-error rendering (i.e., never show AccessDeniedScreen when the user is not authenticated).",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-the-access-denied-page-from-the-codebase-so-it-is-never-rendered-and-is-not-present-as-a-standalone-screen-component-in-the-app",
+      "title": "Remove the Access Denied page from the codebase so it is never rendered and is not present as a standalone screen/component in the app.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-top-level-entry-auth-flow-so-that-any-authorization-unauthorized-error-that-previously-rendered-the-access-denied-screen-instead-clears-the-session-and-shows-the-signed-out-landing-screen-features-sign-in",
+      "title": "Update the top-level entry/auth flow so that any authorization/\"Unauthorized\" error that previously rendered the Access Denied screen instead clears the session and shows the signed-out landing screen (features + sign-in).",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-that-on-initial-load-the-app-always-renders-the-signed-out-landing-screen-features-sign-in-when-the-user-is-not-authenticated-and-never-renders-any-access-denied-ui-while-signed-out-including-transient-flash-states-during-initialization",
+      "title": "Ensure that on initial load the app always renders the signed-out landing screen (Features + Sign in) when the user is not authenticated, and never renders any “Access Denied” UI while signed out (including transient/flash states during initialization).",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-harden-the-top-level-authorization-failure-handling-so-that-any-authorization-related-error-encountered-during-authenticated-startup-e-g-while-fetching-the-current-user-profile-clears-the-session-and-returns-the-user-to-the-signed-out-landing-screen-even-if-the-error-message-does-not-exactly-match-the-current-unauthorized-substring-check",
+      "title": "Harden the top-level authorization failure handling so that any authorization-related error encountered during authenticated startup (e.g., while fetching the current user profile) clears the session and returns the user to the signed-out landing screen, even if the error message does not exactly match the current 'Unauthorized' substring check.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -242,6 +299,20 @@
       "summary": "Add subtasks with backend persistence: each task supports an ordered checklist of subtasks (id, title, isCompleted). Provide APIs to add/update/delete subtasks and toggle completion, and include subtask data when fetching tasks.",
       "reqIds": [
         "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Update auth/routing flow to remove the “Access Denied” starting page and redirect unauthenticated users directly to the Login/Register screen on initial load; after sign-in, route users to the Tasks page.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Remove any remaining Access Denied screen UI from the runtime bundle: the project should not contain a renderable AccessDeniedScreen implementation, and no code path should import/render it (keep the file removed or as a non-renderable stub, but ensure it cannot produce UI).",
+      "reqIds": [
+        "REQ-30"
       ],
       "status": "pending"
     }
